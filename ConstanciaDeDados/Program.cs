@@ -3,6 +3,7 @@ using System.Text.Json;
 using ConstanciaDeDados.Entities;
 using ConstanciaDeDados.Exceptions;
 using ConstanciaDeDados.Services;
+using ConstanciaDeDados.Entities.Enums;
 
 namespace ConstanciaDeDados
 {
@@ -11,43 +12,81 @@ namespace ConstanciaDeDados
         static void Main(string[] args)
         {
             List<Pessoa> pessoas = PessoaService.Carregar();
+
+
             try
             {
                 while (true)
                 {
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine("Selecione uma opção");
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine("|Adicionar - [0]  |");
+                    Console.WriteLine("|Remover   - [1]  |");
+                    Console.WriteLine("|Mostrar   - [2]  |");
+                    Console.WriteLine("|Sair      - [3]  |");//adiconar atualizar cadastro
+                    Console.WriteLine("-------------------");
+                    Console.Write(":");
+                    string entrada = (Console.ReadLine());
 
-                    Console.WriteLine("Pessoas já cadastradas");
-                    if (pessoas.Count == 0)
-                    {
-                        Console.WriteLine("Nenhuma pessoas foi cadastrada ainda");
-                    }
-                    else
-                    {
-                        foreach (Pessoa p in pessoas)
-                        {
-                            Console.WriteLine("Nome: "
-                                + p.Nome
-                                + "\nIdade: "
-                                + p.Idade);
-                        }
-                    }
+                    bool parseOk = Enum.TryParse<MenuOpcao>(entrada, out MenuOpcao opcao);
 
-                    Console.WriteLine("Deseja inserir um novo cadastro?");
-                    char resp = char.Parse(Console.ReadLine());
-
-                    if (resp == 's')
+                    switch (opcao)
                     {
-                        Console.Write("Insira o nome:");
-                        string nome = Console.ReadLine();
-                        Console.Write("Insira a idade:");
-                        int idade = int.Parse(Console.ReadLine());
+                        case MenuOpcao.Adicionar:
+                            Console.Write("Insira o nome:");
+                            string nome = Console.ReadLine();
+                            Console.Write("Insira a idade:");
+                            int idade = int.Parse(Console.ReadLine());
+                            Console.Write("Insira o ID:");
+                            int id = int.Parse(Console.ReadLine());
 
-                        pessoas.Add(new Pessoa(nome, idade));
-                        PessoaService.Salvar(pessoas);
-                    }
-                    else
-                    {
-                        break;
+                            pessoas.Add(new Pessoa(nome, idade, id));
+                            PessoaService.Salvar(pessoas);
+                            break;
+
+                        case MenuOpcao.Remover:
+                            Console.WriteLine("Informe o ID para remover:");
+                            int idRemovido = int.Parse(Console.ReadLine());
+                            try
+                            {
+                                PessoaService.Remover(idRemovido);
+                                Console.WriteLine($"Pessoa '{idRemovido}' removido(a) com sucesso!!");
+                            }
+                            catch (DomainException e)
+                            {
+                                Console.WriteLine("O inserido não existe!" + e.Message);
+                            }
+                            break;
+
+                        case MenuOpcao.Mostrar:
+                            if (pessoas.Count == 0)
+                            {
+                                Console.WriteLine("Nenhuma pessoas foi cadastrada ainda");
+                            }
+                            else
+                            {
+                                foreach (Pessoa p in pessoas)
+                                {
+                                    Console.WriteLine("___________________________________________");
+                                    Console.WriteLine("Nome: "
+                                        + p.Nome
+                                        + "\nIdade: "
+                                        + p.Idade
+                                        +"\nID: "
+                                        + p.Id);   
+                                }
+                            }
+                            break;
+
+                        case MenuOpcao.Sair:
+                            
+                            Console.WriteLine("Saindo...");
+                            return;
+
+                        default:
+                            Console.WriteLine("Opção inválida");
+                            break;
                     }
                     /*Console.WriteLine();
 
@@ -74,9 +113,9 @@ namespace ConstanciaDeDados
                     */
                 }
             }
-            catch (DomainException e)
+            catch (Exception e)
             {
-
+                Console.WriteLine("Erro inesperado!" + e.Message);
             }
         }
     }
