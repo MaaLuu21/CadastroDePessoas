@@ -1,6 +1,6 @@
 ﻿using ConstanciaDeDados.Services;
 
-namespace ConstanciaDeDados
+namespace CadastroDePessoas
 {
     class Program
     {
