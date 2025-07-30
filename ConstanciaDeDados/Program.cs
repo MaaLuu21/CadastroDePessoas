@@ -4,6 +4,7 @@ using ConstanciaDeDados.Entities;
 using ConstanciaDeDados.Exceptions;
 using ConstanciaDeDados.Services;
 using ConstanciaDeDados.Entities.Enums;
+using ConstanciaDeDados.Repositories;
 
 namespace ConstanciaDeDados
 {
@@ -11,38 +12,59 @@ namespace ConstanciaDeDados
     {
         static void Main(string[] args)
         {
-            List<Pessoa> pessoas = PessoaService.Carregar();
-
+            List<Pessoa> pessoas = PessoaRepository.Carregar();
 
             try
             {
                 while (true)
                 {
-                    Console.WriteLine("-------------------");
-                    Console.WriteLine("Selecione uma opção");
-                    Console.WriteLine("-------------------");
-                    Console.WriteLine("|Adicionar - [0]  |");
-                    Console.WriteLine("|Remover   - [1]  |");
-                    Console.WriteLine("|Mostrar   - [2]  |");
-                    Console.WriteLine("|Sair      - [3]  |");//adiconar atualizar cadastro
-                    Console.WriteLine("-------------------");
+                    int total = PessoaService.TotalPessoasCadastradas();
+                    //Atualizar cadastro do ID tal... Maria Luiza ID= 558899 mudou de nome tem que atualizar..."
+                    Console.WriteLine(" _____________________");
+                    Console.WriteLine("|Selecione uma opção  |");
+                    Console.WriteLine("|---------------------|");
+                    Console.WriteLine("|Adicionar - [0]      |");
+                    Console.WriteLine("|Remover   - [1]      |");
+                    Console.WriteLine("|Mostrar   - [2]      |");
+                    Console.WriteLine("|Atualizar - [3]      |");
+                    Console.WriteLine("|Sair      - [4]      |");
+                    Console.WriteLine("|---------------------|");
+                    Console.WriteLine($"|Total Cadastro     {total} |");
+                    Console.WriteLine(" --------------------");
                     Console.Write(":");
                     string entrada = (Console.ReadLine());
+                    
 
                     bool parseOk = Enum.TryParse<MenuOpcao>(entrada, out MenuOpcao opcao);
 
                     switch (opcao)
                     {
                         case MenuOpcao.Adicionar:
+                            Console.Clear();
                             Console.Write("Insira o nome:");
                             string nome = Console.ReadLine();
                             Console.Write("Insira a idade:");
-                            int idade = int.Parse(Console.ReadLine());
+                            if (!int.TryParse(Console.ReadLine(), out int idade))
+                            {
+                                Console.WriteLine("Idade inválida.");
+                                break;
+                            }
                             Console.Write("Insira o ID:");
-                            int id = int.Parse(Console.ReadLine());
+                            if (!int.TryParse(Console.ReadLine(), out int id))
+                            {
+                                Console.WriteLine("ID inválido.");
+                                break;
+                            }
+                            if (pessoas.Any(p => p.Id == id))
+                            {
+                                Console.WriteLine($"Já existe uma pessoa com o ID {id}. Escolha outro.");
+                                break;
+                            }
+
 
                             pessoas.Add(new Pessoa(nome, idade, id));
-                            PessoaService.Salvar(pessoas);
+                            PessoaRepository.Salvar(pessoas);
+                            pessoas = PessoaRepository.Carregar();
                             break;
 
                         case MenuOpcao.Remover:
@@ -50,16 +72,18 @@ namespace ConstanciaDeDados
                             int idRemovido = int.Parse(Console.ReadLine());
                             try
                             {
+                                Console.Clear();
                                 PessoaService.Remover(idRemovido);
-                                Console.WriteLine($"Pessoa '{idRemovido}' removido(a) com sucesso!!");
+                                pessoas = PessoaRepository.Carregar();
                             }
                             catch (DomainException e)
                             {
-                                Console.WriteLine("O inserido não existe!" + e.Message);
+                                Console.WriteLine(e.Message);
                             }
                             break;
 
                         case MenuOpcao.Mostrar:
+                            Console.Clear();
                             if (pessoas.Count == 0)
                             {
                                 Console.WriteLine("Nenhuma pessoas foi cadastrada ainda");
@@ -78,10 +102,34 @@ namespace ConstanciaDeDados
                                 }
                             }
                             break;
+                        case MenuOpcao.Atualizar:
+                            Console.WriteLine("Informe o ID da pessoa a ser atualizada:");
+                            int idAtualizado = int.Parse(Console.ReadLine());
+
+                            try
+                            {
+                                Console.WriteLine("Insira novo nome:");
+                                string nomeAtualizado = Console.ReadLine();
+                                
+                                PessoaService.Atualizar(idAtualizado, nomeAtualizado);
+                                pessoas = PessoaRepository.Carregar();
+                            }
+                            catch (DomainException e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                            break;
 
                         case MenuOpcao.Sair:
-                            
-                            Console.WriteLine("Saindo...");
+                            Console.Clear();
+                            Console.Write("Saindo");
+                            Thread.Sleep(300);
+                            Console.Write(".");
+                            Thread.Sleep(300);
+                            Console.Write(".");
+                            Thread.Sleep(300);
+                            Console.Write(".");
+                            Thread.Sleep(500);
                             return;
 
                         default:

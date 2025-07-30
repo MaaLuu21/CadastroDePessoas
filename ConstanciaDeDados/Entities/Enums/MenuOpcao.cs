@@ -11,6 +11,7 @@ namespace ConstanciaDeDados.Entities.Enums
         Adicionar = 0,
         Remover = 1,
         Mostrar = 2,
-        Sair = 3,
+        Atualizar = 3,
+        Sair = 4,
     }
 }
