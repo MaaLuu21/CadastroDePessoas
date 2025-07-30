@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text.Json;
-using ConstanciaDeDados.Entities;
-using ConstanciaDeDados.Exceptions;
+﻿using ConstanciaDeDados.Exceptions;
 using ConstanciaDeDados.Repositories;
 
 namespace ConstanciaDeDados.Services
@@ -34,14 +30,14 @@ namespace ConstanciaDeDados.Services
         }
         public static void Atualizar(int id, string nomeAtualizado)
         {
-            var pessoa = PessoaRepository.Carregar();
+            var pessoas = PessoaRepository.Carregar();
 
-            var pessoaExistente = pessoa.Find(p => p.Id == id);
+            var pessoa = pessoas.Find(p => p.Id == id);
 
-            if(pessoaExistente != null)
+            if(pessoa != null)
             {
-                pessoaExistente.Nome = nomeAtualizado;
-                PessoaRepository.Salvar(pessoa);
+                pessoa.Nome = nomeAtualizado;
+                PessoaRepository.Salvar(pessoas);
                 Console.WriteLine($"'{nomeAtualizado}' atualizado com sucesso!");
             }
             else

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConstanciaDeDados.Entities.Enums
+﻿namespace ConstanciaDeDados.Entities.Enums
 {
     enum MenuOpcao : int
     {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using ConstanciaDeDados.Entities;
 using ConstanciaDeDados.Exceptions;
 
@@ -32,10 +27,19 @@ namespace ConstanciaDeDados.Repositories
                 File.WriteAllText(caminhoArquivo, json);
 
             }
-            catch (DomainException e)
+            catch (IOException e)
             {
-                throw new DomainException("Erro ao salvar o arquivo " + e.Message);
+                throw new DomainException("Erro ao salvar o arquivo: " + e.Message);
             }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new DomainException("Sem permissão para salvar o arquivo: " + e.Message);
+            }
+            catch(JsonException e)
+            {
+                throw new DomainException("Erro na serialização: " + e.Message);
+            }
+
         }
     }
 }
